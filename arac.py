@@ -12,11 +12,14 @@ def saat_kac():
     tr = timezone(timedelta(hours=3))
     return {"saat": datetime.now(tr).strftime("%H:%M")}
 
+def topla(a: float, b: float):
+         """Iki sayiyi toplar."""
+         return {"sonuc": a + b}
 print("=== Aracli Asistan (cikmak icin quit) ===")
 
 chat = client.chats.create(
     model="gemini-3.6-flash",
-    config=types.GenerateContentConfig(tools=[saat_kac]),
+    config=types.GenerateContentConfig(tools=[saat_kac, topla]),
 )
 
 while True:

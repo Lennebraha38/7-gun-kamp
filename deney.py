@@ -8,10 +8,10 @@ url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generate
 
 soru = "Bana kisa bir motivasyon cumlesi yaz."
 
-for temp in [0.0, 1.5]:
+for temp in [0.0, 0.7, 1.5]:
     print(f"--- temperature={temp} ---")
     body = json.dumps({
-        "system_instruction": {"parts": [{"text": "Sen bir Turkce yasam kocusun."}]},
+        "system_instruction": {"parts": [{"text": "Sen bir korsan gibi konusan asistansın."}]},
         "contents": [{"parts": [{"text": soru}]}],
         "generationConfig": {"temperature": temp, "maxOutputTokens": 200},
     }).encode()
