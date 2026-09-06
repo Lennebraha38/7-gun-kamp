@@ -29,20 +29,24 @@ if col.count() == 0:
     col.add(ids=[f"d{i}" for i in range(len(chunks))],
             embeddings=vektorler, documents=chunks)
 
-soru = "What is chunking and what should be considered?"
+soru = "ChromaDB neden tercih edilir?"
 soru_vektor = model.encode(soru).tolist()
-sonuc = col.query(query_embeddings=[soru_vektor], n_results=2)
+sonuc = col.query(query_embeddings=[soru_vektor], n_results=3)
 baglam = "\n\n".join(sonuc["documents"][0])
 print("--- bulunan parcalar (ilk 200 karakter) ---")
 print(baglam[:200] + "...")
 
 url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key={key}"
 govde = json.dumps({
-    "system_instruction": {"parts": [{"text": "Yalnizca verilen baglama dayanarak cevap ver. Baglamda yoksa bilmiyorum de."}]},
+    "system_instruction": {"parts": [{"text": "Baglama dayanarak soruya kisa ve net cevap ver."}]},
     "contents": [{"parts": [{"text": f"Baglam:\n{baglam}\n\nSoru: {soru}"}]}],
-    "generationConfig": {"temperature": 0.1, "maxOutputTokens": 300},
+    "generationConfig": {"temperature": 0.1, "maxOutputTokens": 1000, "thinkingConfig": {"thinkingBudget": 128}},
 }).encode()
 req = urllib.request.Request(url, data=govde, headers={"Content-Type": "application/json"})
-cevap = json.loads(urllib.request.urlopen(req, timeout=30).read().decode())
-print("\n--- model cevabi ---")
-print(cevap["candidates"][0]["content"]["parts"][0]["text"])
+cevap = json.loads(urllib.request.urlopen(req, timeout=120).read().decode())
+k = cevap["candidates"][0]
+print("\nfinish:", k.get("finishReason"))
+print("parca sayisi:", len(k["content"]["parts"]))
+for p in k["content"]["parts"]:
+    print("--- parca ---")
+    print(p.get("text", "[text yok]"))
